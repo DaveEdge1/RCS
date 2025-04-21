@@ -129,9 +129,4 @@ Detrend the growth increment series using the custom RC created from **robustRC*
 >
 > maximum ontogentic age of samples for inclusion in chronology
 
-If you use this code, please cite the original publication using the citation in the right-hand margin.
-  number={9},
-  pages={e2021PA004291},
-  year={2021},
-  publisher={Wiley Online Library}
-}
+If you use this code, please cite the original publication using the GitHub "cite this repository" feature in the right-hand margin.
