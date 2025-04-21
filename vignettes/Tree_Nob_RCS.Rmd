@@ -1,0 +1,46 @@
+---
+title: "Tree_Nob_RCS"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Tree_Nob_RCS}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(RCS)
+library(dplR)
+```
+
+Load the rwl and po data
+
+```{r}
+system.file("extdata", "TreeNobAllLumped10-7.csv", package = "RCS")
+TN_rwl <- read.rwl(fname = system.file("extdata", "TreeNobAllLumped10-7.csv", package = "RCS"))
+TN_po <- read.csv(system.file("extdata", "TN_POLumped_Oct_7_2020.csv", package = "RCS"))
+dim(TN_rwl)
+head(TN_po)
+```
+
+build a regional curve
+
+```{r}
+TN_RC <- robustRC(rwlFile = TN_rwl, poFile = TN_po, truncRC = 6, 
+                  aAligned = FALSE, evO = FALSE, dMethod = NULL, spLen = NULL, 
+                  tvSpline = TRUE, tvRange = c(3,80), tvStiff = NULL)
+```
+
+Use the regional curve to detrend the chronology
+
+```{r}
+TN_rcs <- newRCS(rwlFile = TN_rwl, poFile = TN_po, ratios = TRUE,
+       truncRC = 10, rcIn = TN_RC$RC, ageMin = 12, ageMax = 100)
+```
+
