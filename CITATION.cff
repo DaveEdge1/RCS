@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-message: "If you use this dataset or code, please cite the following article:"
+message: "If you use the dataset or code, please cite the following article:"
 authors:
   - family-names: Edge
     given-names: David C
@@ -22,10 +22,9 @@ authors:
 title: "A multicentennial proxy record of Northeast Pacific sea surface temperatures from the annual growth increments of Panopea generosa"
 version: 1.0.0
 date-released: 2021-09-01
-doi: 10.1029/2021PA004291
-type: article
-journal: Paleoceanography and Paleoclimatology
+doi: "10.1029/2021PA004291"
+type: "article"
+journal: "Paleoceanography and Paleoclimatology"
 volume: 36
 issue: 9
-pages: e2021PA004291
-publisher: Wiley Online Library
+publisher: "Wiley Online Library"
