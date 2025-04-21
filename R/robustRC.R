@@ -1,6 +1,6 @@
 #' create a regional curve (average ring with by ontogenetic age)
 #'
-#' @param rwlFile as created by read.rwl
+#' @param rwlFile as created by read.rwl in dplR
 #' @param poFile two-column file created by dplR
 #' @param truncRC limit curve calculation to regions of a designated minimum sample depth
 #' @param aAligned TRUE/FALSE, is the rwl file already aligned by ontogenetic age?
@@ -32,6 +32,7 @@ robustRC <- function(rwlFile = NULL, poFile = NULL, truncRC = 20, aAligned = FAL
   checks <- rep(NA, length(colnames(rwlFile)))
   for (i in 1:length(colnames(rwlFile))){
     checks[i] <- colnames(rwlFile)[i] == poFile[i,1]
+
     if (checks[i] == FALSE){
       stop(paste0("Sample IDs in rwl file do not match those in the PO file. First unmatched ID at: ", i))
     }

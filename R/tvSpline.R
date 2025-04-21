@@ -6,13 +6,12 @@
 #' @param SpLenRange min/max spline length in nyrs eg (3,80)
 #' @param goStiff at what age should the spline length max out? or NULL
 #'
-#' @importFrom dplR detrend.series
+#' @import dplR
 #'
 #' @return original series and spline
 #' @export
 #'
 tvSpline <- function(series, SpLenRange = c(3,100), goStiff = NULL){
-  library(dplR)
 
   if(is.null(goStiff)){
     goStiff <- length(series)

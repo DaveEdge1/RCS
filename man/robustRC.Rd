@@ -18,7 +18,7 @@ robustRC(
 )
 }
 \arguments{
-\item{rwlFile}{as created by read.rwl}
+\item{rwlFile}{as created by read.rwl in dplR}
 
 \item{poFile}{two-column file created by dplR}
 

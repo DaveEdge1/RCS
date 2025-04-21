@@ -33,8 +33,9 @@ build a regional curve
 
 ```{r}
 TN_RC <- robustRC(rwlFile = TN_rwl, poFile = TN_po, truncRC = 6, 
-                  aAligned = FALSE, evO = FALSE, dMethod = NULL, spLen = NULL, 
-                  tvSpline = TRUE, tvRange = c(3,80), tvStiff = NULL)
+                  aAligned = FALSE, evO = FALSE, dMethod = NULL,
+                  spLen = NULL, tvSpline = TRUE, tvRange = c(3,80),
+                  tvStiff = NULL)
 ```
 
 Use the regional curve to detrend the chronology
