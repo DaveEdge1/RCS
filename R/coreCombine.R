@@ -16,8 +16,7 @@ combCores <- function(rwi, PO=NULL){
       }
     }
   }
-
-  source("D:/Lab Backup/R/is_odd.R")
+  
   newIDS <- data.frame(matrix(ncol = 2, nrow = dim(rwi)[2]))
   colnames(newIDS) <- c("tree", "core")
   #Get rwi stats
