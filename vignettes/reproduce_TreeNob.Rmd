@@ -1,0 +1,118 @@
+---
+title: "Tree Nob RCS Reproduction"
+author: "Dave Edge"
+date: "`r Sys.Date()`"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+## Package Installation
+
+Ensure required packages are installed, including a specific archived version of `dplR` due to recent changes.
+
+```{r install-packages}
+# if (! requireNamespace("remotes", quietly = TRUE)) {
+#   install.packages("remotes")
+# }
+# 
+# # Install Tree Nob RCS code from GitHub
+# remotes::install_github("DaveEdge1/RCS")
+# 
+# # Install specific version of dplR
+# packageurl <- "https://cran.r-project.org/src/contrib/Archive/dplR/dplR_1.7.1.tar.gz"
+# install.packages(packageurl, repos = NULL, type = "source")
+```
+
+## Load Required Libraries
+
+```{r load-libraries}
+library(RCS)
+library(dplR)
+library(ggplot2)
+```
+
+## Load Tree Ring Data
+
+Read in the published version of the data, included with the `RCS` package.
+
+```{r load-data}
+TN_rwl <- read.rwl(fname = system.file("extdata", "TreeNobAllLumped10-7.csv", package = "RCS"))
+TN_po <- read.csv(system.file("extdata", "TN_POLumped_Oct_7_2020.csv", package = "RCS"))
+```
+
+## Combine Measurement Series
+
+Combine series to produce one measurement per sample.
+
+```{r combine-series}
+TNoneCore <- combCores(TN_rwl, TN_po)
+TNrwl <- TNoneCore$rwl
+TNpo <- TNoneCore$PO
+```
+
+## Build Regional Curve
+
+This step constructs a regional curve using robust estimation.
+
+```{r regional-curve}
+TN_RC <- robustRC(rwlFile = TNrwl, poFile = TNpo, truncRC = 20, tvSpline = TRUE, tvRange = c(3,40))
+TN_RC$plot + 
+  geom_vline(xintercept = 11.5, linetype = "dotted", color = "red", size = 1.5)
+```
+
+## Truncate Growth Increments
+
+Remove growth increments outside a defined age range and update the data.
+
+```{r truncate-growth}
+TNtrunc <- ontoTrunc(TNrwl, TNpo, ontoCut = 13)
+TNrwl2 <- TNtrunc$rwl
+TNpo2 <- TNtrunc$po
+```
+
+## Detrend Using Custom RCS
+
+Use the custom RCS curve to detrend the series and build the chronology.
+
+```{r detrend}
+TN_rcs <- dRCS(TNrwl2, TNpo2, TN_RC)
+TNchron <- chron(TN_rcs$rwi, prefix = "")
+
+plot(TNchron[as.numeric(rownames(TNchron)) > 1725, ])
+```
+
+## Compare with NOAA Archived Chronology
+
+Compare newly created chronology with the archived NOAA version.
+
+```{r compare-noaa}
+truncatedTNchorn <- TNchron[as.numeric(rownames(TNchron)) > 1734, ]
+NOAA <- read.rwl(fname = system.file("extdata", "NOAA_archived_truncated.csv", package = "RCS"))
+
+# Correlation
+cor(truncatedTNchorn$std, NOAA$std)
+
+# Differences
+diffs <- abs(truncatedTNchorn$std - NOAA$std)
+max(diffs)
+summary(diffs)
+
+# Greatest positive discrepancy
+truncatedTNchorn[which.max(truncatedTNchorn$std - NOAA$std), ]
+NOAA[which.max(truncatedTNchorn$std - NOAA$std), ]
+
+# Greatest negative discrepancy
+truncatedTNchorn[which.min(truncatedTNchorn$std - NOAA$std), ]
+NOAA[which.min(truncatedTNchorn$std - NOAA$std), ]
+
+# Sample depth difference
+summary(NOAA$s.depth - truncatedTNchorn$samp.depth)
+```
+
+---
+

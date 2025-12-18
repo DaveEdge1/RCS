@@ -1,56 +1,74 @@
 #' Combine multiple ring width measurements from the same sample
 #'
-#' @param rwi
+#' @param rwi ring width data as data.frame from dplR
+#' @param po pith offset data with columns for sample ID and pith offset
 #'
-#' @return rwi
+#' @return list with combined rwl and updated PO
 #' @export
 #'
-combCores <- function(rwi, PO=NULL){
+combCores <- function(rwi, po) {
 
-  if(!is.null(PO)){
-    checks <- rep(NA, length(colnames(rwi)))
-    for (i in 1:length(colnames(rwi))){
-      checks[i] <- colnames(rwi)[i] == PO[i,1]
-      if (checks[i] == FALSE){
-        stop(paste0("Sample IDs in rwl file do not match those in the PO file. First unmatched ID at: ", i))
+  if (ncol(po) != 2)
+    stop("PO must have 2 columns: ID and PO")
+
+  colnames(po) <- c("ID", "PO")
+
+  # Remove exactly ONE trailing letter (upper or lowercase) to get core ID
+  coreID <- sub("([A-Za-z])$", "", po$ID)
+
+  uniqueCores <- unique(coreID)
+
+  newRWL <- list()
+  newPO  <- list()
+
+  for (core in uniqueCores) {
+
+    # indices of all series belonging to this core
+    idx <- which(coreID == core)
+    seriesNames <- po$ID[idx]
+    nSeries <- length(idx)
+
+    # Extract all series data for this core
+    seriesData <- lapply(seriesNames, function(sname) {
+      if (!(sname %in% colnames(rwi))) {
+        stop(paste("Series", sname, "not found in RWI file."))
       }
+      rwi[[sname]]
+    })
+
+    # Combine series by averaging (handles NA values properly)
+    if (nSeries == 1) {
+      # Single series - just use it directly
+      combinedSeries <- seriesData[[1]]
+    } else {
+      # Multiple series - average them row-wise, ignoring NAs
+      seriesMatrix <- do.call(cbind, seriesData)
+      combinedSeries <- apply(seriesMatrix, 1, function(x) {
+        if (all(is.na(x))) {
+          return(NA)
+        } else {
+          return(mean(x, na.rm = TRUE))
+        }
+      })
     }
-  }
-  
-  newIDS <- data.frame(matrix(ncol = 2, nrow = dim(rwi)[2]))
-  colnames(newIDS) <- c("tree", "core")
-  #Get rwi stats
-  for (i in 1:dim(rwi)[2]){
-    #step through i=1 and i=2 setting the "tree" ID to 001 and the "core" ID to 1 and 2
-    newIDS[i,"tree"] <- ceiling(i/2)
-    newIDS[i,"core"] <- colnames(rwi)[i]
 
+    # Store the combined series
+    newRWL[[core]] <- combinedSeries
+
+    # Use the minimum PO value for the combined series
+    newPO[[core]] <- min(po$PO[idx])
   }
 
-  oneShell <- sapply(seq(1,ncol(rwi),2), function(i) {
-    rowMeans(rwi[,c(i, i+1)], na.rm=T)
-  })
+  newRWL <- as.data.frame(newRWL)
 
-  colnames(oneShell) <- unique(gsub('.{1}$', '', newIDS$core))
+  # Preserve the year rownames from the original rwl object
+  rownames(newRWL) <- rownames(rwi)
 
+  newPO <- data.frame(
+    ID = names(newPO),
+    PO = as.numeric(newPO),
+    stringsAsFactors = FALSE
+  )
 
-  if(!is.null(PO)){
-    n <- length(PO[,2])
-    group <- gl(n, 2, n)
-    onePO <- aggregate(PO[,2] ~ group, FUN = min)
-
-    PO <- data.frame("ID" = unique(gsub('.{1}$', '', newIDS$core)),
-                     "PO" = onePO[,2])
-  }
-
-  returns <- list("SampleIDs" = newIDS,
-                  "rwl" = oneShell,
-                  "PO" = PO)
-
-  return(returns)
+  return(list(rwl = newRWL, PO = newPO))
 }
-
-
-
-
-

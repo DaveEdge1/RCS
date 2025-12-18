@@ -4,7 +4,7 @@
 \alias{tvSpline}
 \title{Age-varying spline}
 \usage{
-tvSpline(series, SpLenRange = c(3, 100), goStiff = NULL)
+tvSpline(series, SpLenRange = c(3, 100), goStiff = NULL, plot = FALSE)
 }
 \arguments{
 \item{series}{time series}

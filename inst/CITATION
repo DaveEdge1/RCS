@@ -1,0 +1,28 @@
+bibentry(
+  bibtype  = "Article",
+  title    = "A multicentennial proxy record of Northeast Pacific sea surface temperatures from the annual growth increments of Panopea generosa",
+  author   = c(
+    person("David C", "Edge"),
+    person("David J", "Reynolds"),
+    person("Alan D", "Wanamaker"),
+    person("Daniel", "Griffin"),
+    person("Dominique", "Bureau"),
+    person("Christine", "Outridge"),
+    person("Bethany C", "Stevick"),
+    person("Richard", "Weng"),
+    person("Bryan A", "Black")
+  ),
+  journal  = "Paleoceanography and Paleoclimatology",
+  year     = "2021",
+  volume   = "36",
+  number   = "9",
+  pages    = "e2021PA004291",
+  doi      = "10.1029/2021PA004291",
+  publisher = "Wiley Online Library",
+  textVersion = paste(
+    "Edge, D.C., Reynolds, D.J., Wanamaker, A.D., Griffin, D., Bureau, D., Outridge, C., Stevick, B.C., Weng, R., and Black, B.A. (2021).",
+    "A multicentennial proxy record of Northeast Pacific sea surface temperatures from the annual growth increments of Panopea generosa.",
+    "Paleoceanography and Paleoclimatology, 36(9), e2021PA004291.",
+    "https://doi.org/10.1029/2021PA004291"
+  )
+)

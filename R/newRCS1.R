@@ -81,7 +81,7 @@ newRCS <- function(rwlFile = NULL, poFile = NULL, ratios = TRUE,
     ageAligned <- ageAligned[rcIn[,1],]
     if(suppressWarnings(as.integer(rownames(ageAligned)))[1] < min(rcIn[,1])){
       aa <- as.data.frame(matrix(nrow = length(earlyNA), ncol = length(colnames(ageAligned))))
-      ageAligned <- rbind.data.frame(aa, agggpeAligned)
+      ageAligned <- rbind.data.frame(aa, ageAligned)
       warnTrig <- 1
     }
     if(max(suppressWarnings(as.integer(rownames(ageAligned))), na.rm = T) > max(rcIn[,1])){
@@ -157,10 +157,15 @@ newRCS <- function(rwlFile = NULL, poFile = NULL, ratios = TRUE,
   for (i in 1:dim(ageAligned)[2]){
     p1 <- min(which(!is.na(ageAligned[,i])))
     p2 <- p1 + seriesLengths[i] - 1
+    #EDITED LINES***
+    num <- newAgeAligned[p1:p2, i]
+    den <- newAgeAligned[p1:p2, RCspot]
     if(ratios){
-      ageAlignedDet[p1:p2,i] <- na.omit(newAgeAligned[i]/newAgeAligned[RCspot])
-    }else(
-      ageAlignedDet[p1:p2,i] <- na.omit(newAgeAligned[i] - newAgeAligned[RCspot]))
+      ageAlignedDet[p1:p2,i] <- num / den
+    } else {
+      ageAlignedDet[p1:p2,i] <- num - den
+    }
+    #***
   }
   #########################################################
   #########################################################
@@ -177,7 +182,14 @@ newRCS <- function(rwlFile = NULL, poFile = NULL, ratios = TRUE,
   #########################################################
   #Step 13
   #Plot the chronology
-  plot.crn(chron(rwi))
+  #EDITED LINES***
+  crn_obj <- dplR::chron(rwi)
+  # Use generic plot on cron object
+  plot(crn_obj,
+       main = "Detrended Chronology",
+       xlab = "Year",
+       ylab = "Index")
+  #***
 
   return(list("rwi" = rwi, "rcInfo" = rcsInfo, "ageAligned" = ageAligned, "ageAlignedDetrended" = ageAlignedDet,
               "ageLimits" = ageLimits))

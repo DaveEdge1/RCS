@@ -12,7 +12,7 @@
 #' @export
 #'
 ontoTrunc <- function(rwl, po, ontoCut){
-
+  
   #Check that the sample IDs in the PO and RWL files match
   checks <- rep(NA, length(colnames(rwl)))
   for (i in 1:length(colnames(rwl))){
@@ -20,7 +20,7 @@ ontoTrunc <- function(rwl, po, ontoCut){
     if (checks[i] == FALSE){
       stop(paste0("Sample IDs in rwl file do not match those in the PO file. First unmatched ID at: ", i))}
   }
-
+  
   goHalf <- FALSE
   goFull <- FALSE
   #Check ontoCut input
@@ -32,7 +32,7 @@ ontoTrunc <- function(rwl, po, ontoCut){
   }else{
     stop("ontoCut must be 1 or 2 integers as in ontoCut = 3 or ontoCut = c(3,80)")
   }
-
+  
   if (goFull){
     for (i in 1:dim(po)[1]){
       seriesLen <- sum(!is.na(rwl[,i]))
@@ -45,11 +45,11 @@ ontoTrunc <- function(rwl, po, ontoCut){
       }
     }
   }
-
-
+  
+  
   #Check po file for series whose first increment is less than the early age cutoff
   #Iterate over series and remove any info prior to the first ontogentic cutoff
-
+  
   if (goHalf){
     for (i in 1:dim(po)[1]){
       if (po[i,2] < ontoCut[1]){
@@ -61,9 +61,9 @@ ontoTrunc <- function(rwl, po, ontoCut){
       }
     }
   }
-
+  
   returns <- list("rwl" = rwl, "po" = po)
   return(returns)
-
-
+  
+  
 }

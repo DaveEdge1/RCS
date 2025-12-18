@@ -6,12 +6,14 @@
 #' @param SpLenRange min/max spline length in nyrs eg (3,80)
 #' @param goStiff at what age should the spline length max out? or NULL
 #'
-#' @import dplR
+#' @import ggplot2
+#' @importFrom tidyr pivot_longer
+#' @importFrom dplR detrend.series
 #'
 #' @return original series and spline
 #' @export
 #'
-tvSpline <- function(series, SpLenRange = c(3,100), goStiff = NULL){
+tvSpline <- function(series, SpLenRange = c(3,100), goStiff = NULL, plot=FALSE){
 
   if(is.null(goStiff)){
     goStiff <- length(series)
@@ -22,16 +24,33 @@ tvSpline <- function(series, SpLenRange = c(3,100), goStiff = NULL){
 
   keepVal <- rep(NA,length(spLens))
   for(i in 1:goStiff){
-    dCurve <- detrend.series(series, method = "Spline", nyrs = spLens[i], return.info = T, make.plot = F)
-    keepVal[i] <- dCurve$curves[i]
+    #EDITED LINES***
+    dCurve <- dplR::detrend.series(series, method = "Spline", nyrs = spLens[i], return.info = TRUE, make.plot = FALSE)
+    keepVal[i] <- dCurve$curve[i]
+
   }
+  if (plot) {
+    plotData <- data.frame(Age = 1:length(series),
+                           Original = series,
+                           Spline = keepVal)
+    plotDataMelt <- tidyr::pivot_longer(plotData,
+                                        cols = c("Original", "Spline"),
+                                        names_to = "variable",
+                                        values_to = "value")
 
-  par(mfrow=c(1,1))
-  plot(series, type = "l")
-  lines(keepVal, col="blue")
+    p1 <- ggplot2::ggplot(plotDataMelt,
+                          aes(x = Age, y = value, color = variable, size = variable)) +
+      geom_line() +
+      scale_color_manual(values = c("Original" = "grey50", "Spline" = "blue")) +
+      scale_size_manual(values = c("Original" = 0.5, "Spline" = 1.5)) +
+      labs(x = "Ontogenetic Age", y = "Growth (microns)", title = "Age-varying Spline") +
+      theme_minimal() +
+      theme(legend.title = element_blank())
 
-  returns <- list("series" = series,
-                  "spline" = keepVal)
+    print(p1)
+  }
+  return(list(series = series, spline = keepVal))
 
-  return(returns)
+  #***
+
 }

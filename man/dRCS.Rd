@@ -14,7 +14,7 @@ dRCS(rwl, po, rc)
 \item{rc}{regional curve formatted as the RC object returned from robustRC()}
 }
 \value{
-series info, rwi, plot data, plot
+list containing series info, rwi, plot data, plot
 }
 \description{
 regional curve standardization with plotting and custom RC input

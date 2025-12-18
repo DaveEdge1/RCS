@@ -4,13 +4,15 @@
 \alias{combCores}
 \title{Combine multiple ring width measurements from the same sample}
 \usage{
-combCores(rwi, PO = NULL)
+combCores(rwi, po)
 }
 \arguments{
-\item{rwi}{}
+\item{rwi}{ring width data as data.frame from dplR}
+
+\item{po}{pith offset data with columns for sample ID and pith offset}
 }
 \value{
-rwi
+list with combined rwl and updated PO
 }
 \description{
 Combine multiple ring width measurements from the same sample

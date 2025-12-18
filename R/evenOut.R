@@ -6,12 +6,12 @@
 #' @export
 #' @description
 #' There should probably be a citation here, but I didn't write it down when I first wrote this code
-#' 
+#'
 #'
 evenOut <- function(AgeAlin){
 
   OntoMed <- apply(AgeAlin, 1, function(x) median(x, na.rm = TRUE))
-  
+
   #Compare MSE of points below with points above
   RMSEabove <- 0
   RMSEbelow <- 0
@@ -33,22 +33,27 @@ evenOut <- function(AgeAlin){
   }
   print(paste0("RMSE of points above the median: ", round(RMSEabove, 0)))
   print(paste0("RMSE of points below the median: ", round(RMSEbelow, 0)))
-  
+
   #Look at RMSE above/below by ontogenetic age
   RMSEdataA <- RMSEdataA[apply(RMSEdataA, 1, function(x) sum(!is.na(x))) > 0,]
   RMSEdataB <- RMSEdataB[apply(RMSEdataB, 1, function(x) sum(!is.na(x))) > 0,]
   ontoRMSEa <- rowMeans(RMSEdataA, na.rm = TRUE)
   ontoRMSEb <- rowMeans(RMSEdataB, na.rm = TRUE)
   x1 <- as.numeric(rownames(RMSEdataB))
-  plot(x1, ontoRMSEb, type = "l", main = "Average distance to Median by Ontogenetic Age", 
+  plot(x1, ontoRMSEb, type = "l", main = "Average distance to Median by Ontogenetic Age",
        sub = "Blue = Points above median, Black = Points below", xlab = "Ontogenetic Age",
        ylab = "Average offset from median (RMSE, microns)")
   lines(x1, ontoRMSEa, col = "blue")
-  
-  #Adjust points to create equal spread avove and below
-  ontoAspline <- detrend.series(ontoRMSEa, return.info = TRUE, method = "Spline", nyrs = 21)
-  ontoBspline <- detrend.series(ontoRMSEb, return.info = TRUE, method = "Spline", nyrs = 21)
-  
+
+  #EDITED LINES***
+  #Adjust points to create equal spread above and below
+  ontoAspline <- dplR::detrend.series(ontoRMSEa, method = "Spline", nyrs = 21, return.info = TRUE)
+  curveA <- as.numeric(ontoAspline$curve)
+
+  ontoBspline <- dplR::detrend.series(ontoRMSEb, method = "Spline", nyrs = 21, return.info = TRUE)
+  curveB <- as.numeric(ontoBspline$curve)
+  #***
+
   aboveLoc <- !is.na(RMSEdataA)
   newAgeAligned <- AgeAlin
   oldAgeAligned <- data.frame(AgeAlin)
@@ -56,11 +61,13 @@ evenOut <- function(AgeAlin){
     nowLoc <- aboveLoc[,i]
     for (j in 1:length(nowLoc)){
       if (nowLoc[j]){
-        newAgeAligned[j,i] <- AgeAlin[j,i] * ontoBspline$curves[[j]]/ontoAspline$curves[[j]]
+        #EDITED LINES***
+        newAgeAligned[j,i] <- AgeAlin[j,i] * curveB[j] / curveA[j]
+        #***
       }
     }
   }
 
   return(newAgeAligned)
-  
+
 }
