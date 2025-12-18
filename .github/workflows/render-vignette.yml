@@ -42,7 +42,7 @@ jobs:
 
       - name: Install R dependencies
         run: |
-          install.packages(c("remotes", "rmarkdown", "knitr", "ggplot2"))
+          install.packages(c("remotes", "rmarkdown", "knitr", "ggplot2", "tidyr", "zoo"))
           # Install specific version of dplR
           packageurl <- "https://cran.r-project.org/src/contrib/Archive/dplR/dplR_1.7.1.tar.gz"
           install.packages(packageurl, repos = NULL, type = "source")
@@ -50,7 +50,12 @@ jobs:
 
       - name: Install RCS package
         run: |
-          remotes::install_local(".", dependencies = TRUE, upgrade = "never")
+          remotes::install_local(".", dependencies = TRUE, upgrade = "never", force = TRUE)
+          # Verify installation
+          if (!requireNamespace("RCS", quietly = TRUE)) {
+            stop("RCS package failed to install")
+          }
+          cat("RCS package successfully installed\n")
         shell: Rscript {0}
 
       - name: Render vignette
